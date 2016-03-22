@@ -32,9 +32,11 @@
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string></string>
+	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Pokemon.ttf</string>
 	</array>
 </dict>
 </plist>
