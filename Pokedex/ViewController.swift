@@ -45,6 +45,12 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         }
     }
     
+    
+    
+    
+    
+    
+    
     func parsePokemonCSV() {
         let path = NSBundle.mainBundle().pathForResource("pokemon", ofType: "csv")!
         
@@ -65,6 +71,13 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         
     }
 
+    
+    
+    
+    
+    
+    
+    
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
         if let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Pokecell", forIndexPath: indexPath) as? PokeCell {
@@ -87,6 +100,11 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     
     
+    
+    
+    
+    
+    
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
        
         let poke: Pokemon!
@@ -96,9 +114,13 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             poke = pokemon[indexPath.row]
         }
         
+        print(poke.name)
         performSegueWithIdentifier("PokemonDetailVC", sender: poke)
     
     }
+    
+    
+    
     
     
     
@@ -110,14 +132,31 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         return pokemon.count
     }
     
+    
+    
+    
+    
+    
+    
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
     }
+    
+    
+    
+    
+    
+    
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         
         return CGSizeMake(105, 105)
     }
+    
+    
+    
+    
+    
     
     
     @IBAction func musicBtnPressed(sender: UIButton!) {
@@ -130,10 +169,21 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         }
     }
     
+    
+    
+    
+    
+    
+    
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         view.endEditing(true)
     }
-        func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+    
+    
+    
+    
+    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
             if searchBar.text == nil || searchBar.text == "" {
                 inSearchMode = false
                 view.endEditing(true)
@@ -146,7 +196,12 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
                 collection.reloadData()
             } }
     
-       override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    
+    
+    
+    
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
             if segue.identifier == "PokemonDetailVC" {
                     if let detailsVC = segue.destinationViewController as? PokemonDetailVC {
                         if let poke = sender as? Pokemon {
