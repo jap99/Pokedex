@@ -8,8 +8,9 @@
 
 import UIKit
 
-class PokemonDetailVC: UIViewController {
+final class PokemonDetailVC: UIViewController {
     
+    var pokemon: Pokemon!
     
     @IBOutlet weak var nameLbl: UILabel!
     @IBOutlet weak var mainImg: UIImageView!
@@ -24,22 +25,29 @@ class PokemonDetailVC: UIViewController {
     @IBOutlet weak var weightLbl: UILabel!
     @IBOutlet weak var baseAttack: UILabel!
     
-    var pokemon: Pokemon!
     
+    // MARK: - INIT
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        nameLbl.text = pokemon.name
+        setup()
+    }
+    
+    
+    // MARK: - SETUP
+    
+    private func setup() {
+        nameLbl.text = pokemon.name.capitalized
         mainImg.image = UIImage(named: "\(pokemon.pokedexId)")
-        
         pokemon.downloadPokemonDetails { () -> () in
-            //this is called after download is done
             self.updateUI()
         }
     }
     
-    func updateUI() {
+    
+    // MARK: - ACTIONS
+    
+    private func updateUI() {
         descriptionLbl.text = pokemon.description
         typeLbl.text = pokemon.type
         defenseLbl.text = pokemon.defense
@@ -47,7 +55,6 @@ class PokemonDetailVC: UIViewController {
         pokedexLbl.text = "\(pokemon.pokedexId)"
         weightLbl.text = pokemon.weight
         baseAttack.text = pokemon.attack
-        
         if pokemon.nextEvolutionId == "" {
             evoLbl.text = "No Evolutions"
             nextEvoImg.isHidden = true
@@ -55,17 +62,13 @@ class PokemonDetailVC: UIViewController {
             nextEvoImg.isHidden = false
             nextEvoImg.image = UIImage(named: pokemon.nextEvolutionId)
             var str = "Next Evolution: \(pokemon.nextEvolutionTxt)"
-            
             if pokemon.nextEvolutionLvl != "" {
-                str += " - LVL \(pokemon.nextEvolutionLvl)"
+                str += " - Level - \(pokemon.nextEvolutionLvl)"
             }
         }
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+    // MARK: - IBACTIONS
     
     @IBAction func backBtnPressed(_ sender: AnyObject) {
         dismiss(animated: true, completion: nil)

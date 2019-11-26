@@ -9,32 +9,37 @@
 import UIKit
 import AVFoundation
 
-class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
-
+final class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
+    
+    private var pokemon = [Pokemon]()
+    private var filteredPokemon = [Pokemon]()
+    private var musicPlayer: AVAudioPlayer!
+    private var inSearchMode = false
+    
     @IBOutlet weak var collection: UICollectionView!
     @IBOutlet var searchBar: UISearchBar!
     
-    var pokemon = [Pokemon]()
-    var filteredPokemon = [Pokemon]()
-    var musicPlayer: AVAudioPlayer!
-    var inSearchMode = false
+    
+    // MARK: - INIT
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        searchBar.returnKeyType = .done
+        parsePokemonCSV()
+        initAudio() 
+    }
+    
+    
+    // MARK: - SETUP
+    
+    private func setup() {
         collection.delegate = self
         collection.dataSource = self
         searchBar.delegate = self
-        searchBar.returnKeyType = UIReturnKeyType.done  
-        
-        parsePokemonCSV()
-        initAudio()
-        
     }
     
-    func initAudio() {
-        
-        let path = Bundle.main.path(forResource: "music", ofType: "mp3")!
-        
+    private func initAudio() {
+        guard let path = Bundle.main.path(forResource: "music", ofType: "mp3") else { return }
         do {
             musicPlayer = try AVAudioPlayer(contentsOf: URL(string: path)!)
             musicPlayer.prepareToPlay()
@@ -46,118 +51,99 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     
+    // MARK: - ACTIONS
     
-    
-    
-    
-    
-    func parsePokemonCSV() {
-        let path = Bundle.main.path(forResource: "pokemon", ofType: "csv")!
-        
+    private func parsePokemonCSV() {
+        guard let path = Bundle.main.path(forResource: "pokemon", ofType: "csv") else { return }
         do {
             let csv = try CSV(contentsOfURL: path)
             let rows = csv.rows
-            
             for row in rows {
                 let pokeId = Int(row["id"]!)!
                 let name = row["identifier"]!
                 let poke = Pokemon(name: name, pokedexId: pokeId)
                 pokemon.append(poke)
             }
-            
         } catch let err as NSError  {
             print(err.debugDescription)
         }
-        
-    }
-
-    
-    
-    
-    
-    
-    
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Pokecell", for: indexPath) as? PokeCell {
-            
-            let poke: Pokemon!
-            
-            if inSearchMode {
-                poke = filteredPokemon[(indexPath as NSIndexPath).row]
-            } else {
-               poke = pokemon[(indexPath as NSIndexPath).row]
-            }
-            
-            cell.configureCell(poke)
-            return cell
-            
-        } else {
-            return UICollectionViewCell()
-        }
     }
     
     
-    
-    
-    
-    
-    
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-       
-        let poke: Pokemon!
-        if inSearchMode {
-            poke = filteredPokemon[(indexPath as NSIndexPath).row]
-        } else {
-            poke = pokemon[(indexPath as NSIndexPath).row]
-        }
-        
-        print(poke.name)
-        performSegue(withIdentifier: "PokemonDetailVC", sender: poke)
-    
-    }
-    
-    
-    
-    
+    // MARK: - COLLECTION VIEW
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        
         if inSearchMode {
             return filteredPokemon.count
         }
         return pokemon.count
     }
     
+    // CELL FOR ITEM
     
-    
-    
-    
-    
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Pokecell", for: indexPath) as? PokeCell {
+            let poke: Pokemon!
+            if inSearchMode {
+                poke = filteredPokemon[(indexPath as NSIndexPath).row]
+            } else {
+                poke = pokemon[(indexPath as NSIndexPath).row]
+            }
+            cell.configureCell(poke)
+            return cell
+        } else {
+            return UICollectionViewCell()
+        }
     }
     
+    // DID SELECT
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let poke: Pokemon!
+        if inSearchMode {
+            poke = filteredPokemon[(indexPath as NSIndexPath).row]
+        } else {
+            poke = pokemon[(indexPath as NSIndexPath).row]
+        }
+        print(poke.name)
+        performSegue(withIdentifier: "PokemonDetailVC", sender: poke)
+    }
     
-    
-    
-    
+    // LAYOUT
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
         return CGSize(width: 105, height: 105)
     }
     
     
+    // MARK: - SEARCH BAR
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        self.view.endEditing(true)
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        DispatchQueue.main.async {
+            self.view.endEditing(true)
+        }
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text == nil || searchBar.text == "" {
+            inSearchMode = false
+            view.endEditing(true)
+            collection.reloadData()
+        } else {
+            inSearchMode = true
+            let lower = searchBar.text!.lowercased()
+            filteredPokemon = pokemon.filter({$0.name.range(of: lower) != nil})
+            collection.reloadData()
+        }
+    }
     
     
-    
-    
+    // MARK: - IBACTIONS
     
     @IBAction func musicBtnPressed(_ sender: UIButton!) {
         if musicPlayer.isPlaying {
@@ -170,49 +156,25 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     
+    // MARK: - NAVIGATION
     
-    
-    
-    
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        view.endEditing(true)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "PokemonDetailVC" {
+            if let detailsVC = segue.destination as? PokemonDetailVC {
+                if let poke = sender as? Pokemon {
+                    detailsVC.pokemon = poke
+                }
+            }
+        }
     }
     
     
     
     
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-            if searchBar.text == nil || searchBar.text == "" {
-                inSearchMode = false
-                view.endEditing(true)
-                collection.reloadData()
-                
-            } else {
-                inSearchMode = true
-                let lower = searchBar.text!.lowercased()
-                filteredPokemon = pokemon.filter({$0.name.range(of: lower) != nil})
-                collection.reloadData()
-            } }
-    
-    
-    
-    
-    
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-            if segue.identifier == "PokemonDetailVC" {
-                    if let detailsVC = segue.destination as? PokemonDetailVC {
-                        if let poke = sender as? Pokemon {
-                            detailsVC.pokemon = poke
-                        }
-                    }
-                }
-            }
-        }
+}
 
 
-    
+
 
 

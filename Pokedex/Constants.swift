@@ -8,7 +8,16 @@
 
 import Foundation
 
-let URL_BASE = "http://pokeapi.co"
-let URL_POKEMON = "/api/v1/pokemon/"
 
 typealias DownloadComplete = () -> ()
+
+
+final class Constants {
+    
+    static let URL_BASE = "http://pokeapi.co"
+    static let URL_POKEMON = "/api/v1/pokemon/"
+     
+    
+}
+
+
