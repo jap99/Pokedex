@@ -14,6 +14,9 @@ typealias DownloadComplete = () -> ()
 
 final class Constants {
     
+    private init() {}
+    static var instance = Constants()
+    
     static let URL_BASE = "http://pokeapi.co"
     static let URL_POKEMON = "/api/v1/pokemon/"
      

@@ -6,6 +6,7 @@
 import Foundation
 
 open class CSV {
+    
     open var headers: [String] = []
     open var rows: [Dictionary<String, String>] = []
     open var columns = Dictionary<String, [String]>()

@@ -24,9 +24,9 @@ final class ViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        searchBar.returnKeyType = .done
-        parsePokemonCSV()
-        initAudio() 
+        self.setup()
+        self.parsePokemonCSV()
+        self.initAudio() 
     }
     
     
@@ -36,6 +36,7 @@ final class ViewController: UIViewController, UICollectionViewDelegate, UICollec
         collection.delegate = self
         collection.dataSource = self
         searchBar.delegate = self
+        searchBar.returnKeyType = .done
     }
     
     private func initAudio() {
